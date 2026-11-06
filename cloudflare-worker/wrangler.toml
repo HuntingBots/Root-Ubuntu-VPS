@@ -1,0 +1,11 @@
+name = "root-vps-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Environment Variables
+[vars]
+# Change this to your deployed Koyeb or Railway application URL
+BACKEND_URL = "https://your-app.koyeb.app"
+
+# Optional: Set an access token for edge security (leave empty if not needed)
+# ACCESS_KEY = "mysecrettoken123"

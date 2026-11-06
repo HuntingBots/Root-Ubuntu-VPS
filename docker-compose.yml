@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  root-ubuntu-vps:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: root-ubuntu-vps
+    restart: unless-stopped
+    ports:
+      - "7681:7681" # Web Terminal (ttyd)
+      - "2222:22"   # OpenSSH Server
+    environment:
+      - ROOT_PASSWORD=HuntingBots123!
+      - PORT=7681
+      # Optional: Cloudflare Zero Trust Tunnel Token
+      # - TUNNEL_TOKEN=eyJhIjoi...
+      # Optional: Free TryCloudflare Quick Tunnel
+      # - QUICK_TUNNEL=true
+      # Optional: Tailscale Auth Key for mesh IPv4
+      # - TAILSCALE_AUTHKEY=tskey-auth-...
+      # Optional: Ngrok Auth Token for public SSH IPv4
+      # - NGROK_AUTHTOKEN=your_ngrok_token
+      # Optional: tmate instant SSH
+      # - TMATE_ENABLED=true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun

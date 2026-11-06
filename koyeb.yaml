@@ -1,0 +1,17 @@
+name: root-ubuntu-vps
+services:
+  - name: root-vps
+    type: web
+    git:
+      repository: HuntingBots/Root-Ubuntu-VPS
+      branch: HuntingBots
+    dockerfile: Dockerfile
+    instance_type: nano
+    ports:
+      - port: 7681
+        path: /
+    env:
+      - key: ROOT_PASSWORD
+        value: "HuntingBots123!"
+      - key: PORT
+        value: "7681"

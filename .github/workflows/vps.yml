@@ -1,0 +1,88 @@
+name: Root Ubuntu VPS (GitHub Actions)
+
+on:
+  workflow_dispatch:
+    inputs:
+      vps_password:
+        description: 'VPS Root Password'
+        required: false
+        default: 'HuntingBots123!'
+      tunnel_mode:
+        description: 'Tunnel Mode (tmate / tailscale / ngrok)'
+        required: false
+        default: 'tmate'
+        type: choice
+        options:
+          - tmate
+          - tailscale
+          - ngrok
+
+jobs:
+  run-vps:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350 # Maximum allowable GitHub Actions execution time (~6 hours)
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Root Password
+        run: |
+          PASSWORD="${{ github.event.inputs.vps_password }}"
+          [ -z "$PASSWORD" ] && PASSWORD="HuntingBots123!"
+          echo "runner:$PASSWORD" | sudo chpasswd
+          echo "root:$PASSWORD" | sudo chpasswd
+          echo "[✓] Passwords configured for runner and root."
+
+      - name: Configure OpenSSH Server
+        run: |
+          sudo apt-get update && sudo apt-get install -y openssh-server
+          sudo sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+          sudo sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+          echo "PasswordAuthentication yes" | sudo tee /etc/ssh/sshd_config.d/99-enable-password.conf
+          echo "PermitRootLogin yes" | sudo tee /etc/ssh/sshd_config.d/99-enable-root.conf
+          sudo systemctl restart ssh
+          echo "[✓] SSH server configured and restarted."
+
+      - name: Start tmate Tunnel
+        if: ${{ github.event.inputs.tunnel_mode == 'tmate' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+
+      - name: Connect Tailscale
+        if: ${{ github.event.inputs.tunnel_mode == 'tailscale' }}
+        env:
+          TAILSCALE_AUTHKEY: ${{ secrets.TAILSCALE_AUTHKEY }}
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+          sudo tailscaled &
+          sleep 5
+          sudo tailscale up --authkey "${TAILSCALE_AUTHKEY}" --hostname "gh-vps-$(date +%s)" --ssh
+          echo "================================================="
+          echo " Tailscale Mesh IPv4: $(tailscale ip -4)"
+          echo " Connect using: ssh root@$(tailscale ip -4)"
+          echo "================================================="
+
+      - name: Connect Ngrok
+        if: ${{ github.event.inputs.tunnel_mode == 'ngrok' }}
+        env:
+          NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+        run: |
+          curl -s https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz | sudo tar -xz -C /usr/local/bin
+          ngrok config add-authtoken "${NGROK_AUTHTOKEN}"
+          ngrok tcp 22 --log=stdout > /tmp/ngrok.log 2>&1 &
+          sleep 5
+          NGROK_URL=$(grep -o 'tcp://[-a-zA-Z0-9.:]*' /tmp/ngrok.log | head -n 1)
+          echo "================================================="
+          echo " Ngrok SSH Endpoint: $NGROK_URL"
+          echo " Connect using: ssh runner@${NGROK_URL#tcp://}"
+          echo "================================================="
+
+      - name: Keep Alive Loop
+        run: |
+          echo "================================================="
+          echo " 🚀 Root Ubuntu VPS is active and running!"
+          echo " Session will remain active for up to 6 hours."
+          echo "================================================="
+          sleep 5h 50m
