@@ -1,28 +1,82 @@
 version: '3.8'
 
 services:
-  root-ubuntu-vps:
+  root-ubuntu-vps-1:
+    image: root-ubuntu-vps:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: root-ubuntu-vps
+    container_name: root-ubuntu-vps-1
+    hostname: ubuntu-vps-1
     restart: unless-stopped
     ports:
+      - "80:80"     # HTTP Web Server (IPTV)
       - "7681:7681" # Web Terminal (ttyd)
       - "2222:22"   # OpenSSH Server
     environment:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7681
-      # Optional: Cloudflare Zero Trust Tunnel Token
-      # - TUNNEL_TOKEN=eyJhIjoi...
-      # Optional: Free TryCloudflare Quick Tunnel
-      # - QUICK_TUNNEL=true
-      # Optional: Tailscale Auth Key for mesh IPv4
-      # - TAILSCALE_AUTHKEY=tskey-auth-...
-      # Optional: Ngrok Auth Token for public SSH IPv4
-      # - NGROK_AUTHTOKEN=your_ngrok_token
-      # Optional: tmate instant SSH
-      # - TMATE_ENABLED=true
+      - QUICK_TUNNEL=true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+  root-ubuntu-vps-2:
+    image: root-ubuntu-vps:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: root-ubuntu-vps-2
+    hostname: ubuntu-vps-2
+    restart: unless-stopped
+    ports:
+      - "7682:7682" # Web Terminal (ttyd)
+      - "2223:22"   # OpenSSH Server
+    environment:
+      - ROOT_PASSWORD=HuntingBots123!
+      - PORT=7682
+      - QUICK_TUNNEL=true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+  root-ubuntu-vps-3:
+    image: root-ubuntu-vps:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: root-ubuntu-vps-3
+    hostname: ubuntu-vps-3
+    restart: unless-stopped
+    ports:
+      - "7683:7683" # Web Terminal (ttyd)
+      - "2224:22"   # OpenSSH Server
+    environment:
+      - ROOT_PASSWORD=HuntingBots123!
+      - PORT=7683
+      - QUICK_TUNNEL=true
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+  root-ubuntu-vps-4:
+    image: root-ubuntu-vps:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: root-ubuntu-vps-4
+    hostname: ubuntu-vps-4
+    restart: unless-stopped
+    ports:
+      - "7684:7684" # Web Terminal (ttyd)
+      - "2225:22"   # OpenSSH Server
+    environment:
+      - ROOT_PASSWORD=HuntingBots123!
+      - PORT=7684
+      - QUICK_TUNNEL=true
     cap_add:
       - NET_ADMIN
     devices:
