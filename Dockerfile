@@ -65,6 +65,12 @@ RUN mkdir -p /var/run/sshd /root/.ssh && \
     echo "PermitRootLogin yes" > /etc/ssh/sshd_config.d/root.conf && \
     echo "PasswordAuthentication yes" > /etc/ssh/sshd_config.d/password.conf
 
+# Fake VPS specs emulation & resource virtualization
+RUN mkdir -p /opt/fakevps
+COPY libfakevps.c /opt/fakevps/libfakevps.c
+COPY setup_fake_vps.py /usr/local/bin/setup_fake_vps.py
+RUN chmod +x /usr/local/bin/setup_fake_vps.py && python3 /usr/local/bin/setup_fake_vps.py
+
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

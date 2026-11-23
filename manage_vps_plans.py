@@ -16,6 +16,7 @@ import socket
 import json
 import datetime
 import urllib.request
+import re
 
 BANNER = r"""
 ================================================================================
@@ -326,6 +327,46 @@ def set_custom_password(plan_num, new_password):
     except Exception as e:
         print(f"[✗] Error setting password: {e}")
 
+def apply_specs_all():
+    """Applies simulated VPS plan hardware specs (CPU, RAM, NVMe Disk) to all running containers."""
+    plans = load_plans()
+    print(BANNER)
+    print("[*] Applying plan specs (CPU Cores, RAM, NVMe Disk) to all running containers...")
+    libfakevps_path = os.path.join(BASE_DIR, "libfakevps.c")
+    setup_py_path = os.path.join(BASE_DIR, "setup_fake_vps.py")
+
+    for num, v in sorted(plans.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 999):
+        cname = v["container"]
+        cpu_clean = re.sub(r"[^\d]", "", str(v.get("cpu", "2"))) or "2"
+        ram_clean = v.get("ram", "4GB").upper()
+        storage_clean = v.get("storage", "80GB").upper()
+
+        status = get_container_status(cname)
+        if status != "running":
+            print(f"[-] {v['plan']} ({cname}): Skipped (Status: {status})")
+            continue
+
+        try:
+            # Copy source files
+            subprocess.run(["docker", "exec", cname, "mkdir", "-p", "/opt/fakevps"], check=True)
+            if os.path.exists(libfakevps_path):
+                subprocess.run(["docker", "cp", libfakevps_path, f"{cname}:/opt/fakevps/libfakevps.c"], check=True)
+            if os.path.exists(setup_py_path):
+                subprocess.run(["docker", "cp", setup_py_path, f"{cname}:/usr/local/bin/setup_fake_vps.py"], check=True)
+
+            # Run setup script with env
+            env_cmd = (
+                f"export VPS_PLAN='{num}' VPS_CPU='{cpu_clean}' VPS_RAM='{ram_clean}' "
+                f"VPS_STORAGE='{storage_clean}' VPS_DISK_NAME='nvme0n1' VPS_DISK_MODEL='NVMe SSD'; "
+                f"python3 /usr/local/bin/setup_fake_vps.py"
+            )
+            subprocess.run(["docker", "exec", cname, "sh", "-c", env_cmd], check=True)
+            print(f"[✓] {v['plan']} ({cname}): Specs Applied -> CPU: {cpu_clean} vCore | RAM: {ram_clean} | Storage: {storage_clean}")
+        except Exception as e:
+            print(f"[✗] {v['plan']} ({cname}): Failed to apply specs: {e}")
+
+    print("\n[✓] All active VPS plans hardware specs configured successfully!")
+
 def add_new_vps(plan_num, ram, cpu, storage, ssh_port, web_port, password):
     """
     Creates and starts a new VPS docker container, assigns resources,
@@ -339,6 +380,10 @@ def add_new_vps(plan_num, ram, cpu, storage, ssh_port, web_port, password):
 
     print(f"[*] Creating new VPS Plan {plan_num} ({cname})...")
 
+    cpu_clean = re.sub(r"[^\d]", "", str(cpu)) or "2"
+    ram_clean = ram.upper()
+    storage_clean = storage.upper()
+
     # Docker run command
     cmd = [
         "docker", "run", "-d",
@@ -350,8 +395,14 @@ def add_new_vps(plan_num, ram, cpu, storage, ssh_port, web_port, password):
         "-e", f"ROOT_PASSWORD={password}",
         "-e", f"PORT={web_port}",
         "-e", "QUICK_TUNNEL=true",
+        "-e", f"VPS_PLAN={plan_num}",
+        "-e", f"VPS_CPU={cpu_clean}",
+        "-e", f"VPS_RAM={ram_clean}",
+        "-e", f"VPS_STORAGE={storage_clean}",
+        "-e", "VPS_DISK_NAME=nvme0n1",
+        "-e", "VPS_DISK_MODEL=NVMe SSD",
         f"--memory={ram.lower()}",
-        f"--cpus={cpu}",
+        f"--cpus={cpu_clean}",
         "--cap-add=NET_ADMIN",
         "--device=/dev/net/tun:/dev/net/tun",
         "root-ubuntu-vps:latest"
@@ -393,6 +444,7 @@ def print_help():
     print("  python3 manage_vps_plans.py update-md            Regenerate & update vps_details.md immediately")
     print("  python3 manage_vps_plans.py test                 Test live SSH authentication for all VPS")
     print("  python3 manage_vps_plans.py apply                Apply all predefined passwords to containers")
+    print("  python3 manage_vps_plans.py apply-specs          Apply plan hardware specs (CPU, RAM, NVMe) to all VPS")
     print("  python3 manage_vps_plans.py set-pass <num> <pwd> Set custom password for VPS & auto-update md")
     print("  python3 manage_vps_plans.py add-vps <num> <ram> <cpu> <storage> <ssh_port> <web_port> <pwd>")
     print("=" * 80)
@@ -412,6 +464,8 @@ def main():
         test_ssh_all()
     elif cmd == "apply":
         apply_passwords()
+    elif cmd in ("apply-specs", "specs", "sync-specs"):
+        apply_specs_all()
     elif cmd == "set-pass":
         if len(sys.argv) < 4:
             print("Usage: python3 manage_vps_plans.py set-pass <plan_num> <new_password>")

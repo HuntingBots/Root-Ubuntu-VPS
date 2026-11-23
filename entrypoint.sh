@@ -15,6 +15,11 @@ echo "=================================================================="
 echo "          🚀 Starting Root Ubuntu VPS (24/7 Container)            "
 echo "=================================================================="
 
+# 0. Initialize VPS Plan Specs (CPU, RAM, NVMe Disk Virtualization)
+if [ -f /usr/local/bin/setup_fake_vps.py ]; then
+    python3 /usr/local/bin/setup_fake_vps.py || true
+fi
+
 # 1. Set root password
 echo "root:${ROOT_PASSWORD}" | chpasswd
 echo "[✓] Root password configured successfully."

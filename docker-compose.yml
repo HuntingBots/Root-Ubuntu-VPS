@@ -19,6 +19,12 @@ services:
       - QUICK_TUNNEL=true
       - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
       - TAILSCALE_HOSTNAME=root-ubuntu-vps-1
+      - VPS_PLAN=2
+      - VPS_CPU=4
+      - VPS_RAM=8GB
+      - VPS_STORAGE=200GB
+      - VPS_DISK_NAME=nvme0n1
+      - VPS_DISK_MODEL=NVMe SSD
     mem_limit: 8g
     cpus: 4.0
     cap_add:
@@ -43,6 +49,12 @@ services:
       - QUICK_TUNNEL=true
       - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
       - TAILSCALE_HOSTNAME=root-ubuntu-vps-2
+      - VPS_PLAN=1
+      - VPS_CPU=2
+      - VPS_RAM=4GB
+      - VPS_STORAGE=80GB
+      - VPS_DISK_NAME=nvme0n1
+      - VPS_DISK_MODEL=NVMe SSD
     mem_limit: 4g
     cpus: 2.0
     cap_add:
@@ -67,6 +79,12 @@ services:
       - QUICK_TUNNEL=true
       - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
       - TAILSCALE_HOSTNAME=root-ubuntu-vps-3
+      - VPS_PLAN=3
+      - VPS_CPU=8
+      - VPS_RAM=16GB
+      - VPS_STORAGE=300GB
+      - VPS_DISK_NAME=nvme0n1
+      - VPS_DISK_MODEL=NVMe SSD
     mem_limit: 16g
     cpus: 8.0
     cap_add:
@@ -91,6 +109,12 @@ services:
       - QUICK_TUNNEL=true
       - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
       - TAILSCALE_HOSTNAME=root-ubuntu-vps-4
+      - VPS_PLAN=4
+      - VPS_CPU=12
+      - VPS_RAM=24GB
+      - VPS_STORAGE=400GB
+      - VPS_DISK_NAME=nvme0n1
+      - VPS_DISK_MODEL=NVMe SSD
     mem_limit: 24g
     cpus: 12.0
     cap_add:
@@ -115,6 +139,12 @@ services:
       - QUICK_TUNNEL=true
       - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
       - TAILSCALE_HOSTNAME=root-ubuntu-vps-5
+      - VPS_PLAN=5
+      - VPS_CPU=16
+      - VPS_RAM=32GB
+      - VPS_STORAGE=500GB
+      - VPS_DISK_NAME=nvme0n1
+      - VPS_DISK_MODEL=NVMe SSD
     mem_limit: 32g
     cpus: 16.0
     cap_add:
