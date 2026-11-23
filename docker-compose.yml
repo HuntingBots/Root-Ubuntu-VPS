@@ -17,6 +17,8 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7681
       - QUICK_TUNNEL=true
+    mem_limit: 4g
+    cpus: 2.0
     cap_add:
       - NET_ADMIN
     devices:
@@ -37,6 +39,8 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7682
       - QUICK_TUNNEL=true
+    mem_limit: 8g
+    cpus: 4.0
     cap_add:
       - NET_ADMIN
     devices:
@@ -57,6 +61,8 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7683
       - QUICK_TUNNEL=true
+    mem_limit: 16g
+    cpus: 8.0
     cap_add:
       - NET_ADMIN
     devices:
@@ -77,6 +83,30 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7684
       - QUICK_TUNNEL=true
+    mem_limit: 24g
+    cpus: 12.0
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+
+  root-ubuntu-vps-5:
+    image: root-ubuntu-vps:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: root-ubuntu-vps-5
+    hostname: ubuntu-vps-5
+    restart: unless-stopped
+    ports:
+      - "7685:7685" # Web Terminal (ttyd)
+      - "2226:22"   # OpenSSH Server
+    environment:
+      - ROOT_PASSWORD=HuntingBots123!
+      - PORT=7685
+      - QUICK_TUNNEL=true
+    mem_limit: 32g
+    cpus: 16.0
     cap_add:
       - NET_ADMIN
     devices:

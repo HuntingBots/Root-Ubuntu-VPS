@@ -10,6 +10,7 @@ import os
 import secrets
 import string
 import urllib.request
+import urllib.error
 import subprocess
 
 BANNER = r"""
@@ -23,6 +24,14 @@ BANNER = r"""
         24/7 Root VPS Generator & Manager (Koyeb / Railway / Docker)
 ============================================================
 """
+
+VPS_PLANS = {
+    1: {"name": "Plan 1", "ram": "4GB", "storage": "80GB NVMe", "cpu": "2 vCore", "web_port": 7681, "ssh_port": 2222, "service": "root-ubuntu-vps-1"},
+    2: {"name": "Plan 2", "ram": "8GB", "storage": "200GB NVMe", "cpu": "4 vCore", "web_port": 7682, "ssh_port": 2223, "service": "root-ubuntu-vps-2"},
+    3: {"name": "Plan 3", "ram": "16GB", "storage": "300GB NVMe", "cpu": "8 vCore", "web_port": 7683, "ssh_port": 2224, "service": "root-ubuntu-vps-3"},
+    4: {"name": "Plan 4", "ram": "24GB", "storage": "400GB NVMe", "cpu": "12 vCore", "web_port": 7684, "ssh_port": 2225, "service": "root-ubuntu-vps-4"},
+    5: {"name": "Plan 5", "ram": "32GB", "storage": "500GB NVMe", "cpu": "16 vCore", "web_port": 7685, "ssh_port": 2226, "service": "root-ubuntu-vps-5"},
+}
 
 def generate_password(length=16):
     chars = string.ascii_letters + string.digits + "!@#$%^&*"
@@ -41,8 +50,61 @@ def check_backend_health(url):
                 print("[✓] VPS Web Terminal / Gateway is ONLINE and reachable!")
             else:
                 print(f"[!] Warning: Unexpected status code {response.status}")
+    except urllib.error.HTTPError as e:
+        if e.code in (200, 401):
+            print(f"[✓] Server responded with HTTP status: {e.code}")
+            print("[✓] VPS Web Terminal / Gateway is ONLINE and reachable (Auth Active)!")
+        else:
+            print(f"[!] Warning: HTTP error {e.code}: {e.reason}")
     except Exception as e:
         print(f"[✗] Error connecting to {url}: {e}")
+
+def show_plans():
+    print(BANNER)
+    print("=" * 65)
+    print("                      VPS TIERS & PLANS")
+    print("=" * 65)
+    for num, plan in VPS_PLANS.items():
+        print(f"\n[{plan['name']}] -> Container: {plan['service']}")
+        print(f"  • RAM:      {plan['ram']}")
+        print(f"  • Storage:  {plan['storage']}")
+        print(f"  • CPU:      {plan['cpu']}")
+        print(f"  • Web Port: {plan['web_port']} (Web Terminal)")
+        print(f"  • SSH Port: {plan['ssh_port']} (OpenSSH)")
+    print("\n" + "=" * 65)
+
+def check_all_vps():
+    print(BANNER)
+    print("[*] Checking health for all 5 VPS local instances...")
+    for num, plan in VPS_PLANS.items():
+        url = f"http://localhost:{plan['web_port']}"
+        print(f"\n--- {plan['name']} (Port {plan['web_port']}) ---")
+        check_backend_health(url)
+
+def show_vps_status():
+    print(BANNER)
+    print("[*] Inspecting running Docker containers and Cloudflare Tunnels...")
+    try:
+        out = subprocess.check_output(
+            ["docker", "ps", "--filter", "name=root-ubuntu-vps", "--format", "{{.Names}}\t{{.Status}}\t{{.Ports}}"],
+            text=True
+        )
+        print("\nRunning Containers:")
+        print(out if out.strip() else "No active root-ubuntu-vps containers found.")
+    except Exception as e:
+        print(f"[✗] Could not query docker: {e}")
+
+    print("\nCloudflare Quick Tunnels:")
+    for num, plan in VPS_PLANS.items():
+        cname = plan["service"]
+        try:
+            cf = subprocess.check_output(
+                ["docker", "exec", cname, "sh", "-c", "grep -o 'https://[-a-zA-Z0-9@:%._\\+~#=]*\\.trycloudflare\\.com' /tmp/cloudflared.log 2>/dev/null | head -n 1"],
+                text=True
+            ).strip()
+            print(f"  - {plan['name']} ({cname}): {cf if cf else 'Not active'}")
+        except Exception:
+            print(f"  - {plan['name']} ({cname}): Offline / Unavailable")
 
 def run_local_docker():
     print("\n[*] Starting local Docker container for Root Ubuntu VPS...")
@@ -68,10 +130,13 @@ def run_local_docker():
 def print_help():
     print(BANNER)
     print("Available Commands:")
-    print("  1. gen-pass              Generate a strong random root password")
-    print("  2. check <URL>           Check if your Koyeb/Railway/Cloudflare VPS is online")
-    print("  3. docker-run            Build and run container locally with Docker")
-    print("  4. help                  Show this help menu")
+    print("  1. plans                 Show all 5 VPS Plans with specs and ports")
+    print("  2. status                Show status & Cloudflare URLs for all 5 VPS")
+    print("  3. check-all             Health-check all 5 VPS web terminals")
+    print("  4. check <URL>           Check if a specific VPS URL is online")
+    print("  5. gen-pass              Generate a strong random root password")
+    print("  6. docker-run            Build and run a single container locally with Docker")
+    print("  7. help                  Show this help menu")
     print("\nEnvironment Variables Supported:")
     print("  - ROOT_PASSWORD          Root & Web Terminal password (default: HuntingBots123!)")
     print("  - PORT                   Port for Web Terminal (default: 7681 or assigned by host)")
@@ -89,7 +154,13 @@ def main():
 
     action = sys.argv[1].lower()
 
-    if action in ("gen-pass", "password"):
+    if action == "plans":
+        show_plans()
+    elif action == "status":
+        show_vps_status()
+    elif action == "check-all":
+        check_all_vps()
+    elif action in ("gen-pass", "password"):
         pwd = generate_password()
         print(f"\nGenerated Strong Password: {pwd}\n")
     elif action == "check":

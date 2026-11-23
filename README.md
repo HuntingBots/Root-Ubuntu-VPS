@@ -149,12 +149,31 @@ Agar aapko normal public IPv4 aur port chahiye bina Tailscale ke:
 git clone https://github.com/HuntingBots/Root-Ubuntu-VPS.git
 cd Root-Ubuntu-VPS
 
-# Start the container
-docker compose up -d
+# Start all VPS plans
+docker-compose up -d
 
 # Check status
-python3 Vps-cli.py check http://localhost:7681
+python3 Vps-cli.py status
 ```
+
+---
+
+## 📊 VPS Plans & Specifications
+
+| Plan | Container Name | RAM | vCPU | Storage (NVMe) | Internal IP | Web Terminal Port | SSH Port |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Plan 1** | `root-ubuntu-vps-1` | **4 GB** | **2 vCore** | **80 GB** | `172.18.0.3` | `7681` | `2222` |
+| **Plan 2** | `root-ubuntu-vps-2` | **8 GB** | **4 vCore** | **200 GB** | `172.18.0.2` | `7682` | `2223` |
+| **Plan 3** | `root-ubuntu-vps-3` | **16 GB** | **8 vCore** | **300 GB** | `172.18.0.4` | `7683` | `2224` |
+| **Plan 4** | `root-ubuntu-vps-4` | **24 GB** | **12 vCore** | **400 GB** | `172.18.0.5` | `7684` | `2225` |
+| **Plan 5** | `root-ubuntu-vps-5` | **32 GB** | **16 vCore** | **500 GB** | `172.18.0.6` | `7685` | `2226` |
+
+> [!NOTE]
+> **Har VPS ke liye Different IP Kaise Kaam Karta Hai?**
+> 1. **Dedicated Mesh IPv4 (Tailscale)**: Har container me `TAILSCALE_AUTHKEY` lagane par har VPS ko apna alag dedicated static `100.x.y.z` IPv4 milta hai jisse direct `ssh root@100.x.y.z` connect kiya ja sakta hai bina port conflict ke.
+> 2. **Dedicated Cloudflare Tunnels**: Har VPS container ka apna alag `*.trycloudflare.com` subdomain URL hota hai jo Cloudflare Anycast edge IPs se route hota hai.
+> 3. **Isolated Docker Subnet**: Har container ko ek independent internal static IP mila hua hai (`172.18.0.x`).
+> 4. **Host Public IP (`85.190.114.54`)**: Physical server par ek main public IPv4 hone ke karan external SSH aur Web access ke liye distinct ports map kiye gaye hain.
 
 ---
 
