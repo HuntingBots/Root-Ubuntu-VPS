@@ -174,6 +174,11 @@ python3 Vps-cli.py status
 > - Run `python3 vps_hosts_generator.py test` to verify live DNS resolution & SSH login across all 5 VPS.
 > - Run `python3 vps_hosts_generator.py <custom_prefix>` (e.g. `python3 vps_hosts_generator.py ghostvpsroot`) apni pasand ka prefix set karne ke liye!
 
+> [!IMPORTANT]
+> **Complete Active VPS Reference Document (`vps_details.md`)**:
+> Dekhein [vps_details.md](vps_details.md) jisme har active VPS ke updated hostnames, ports, passwords, Tailscale IPs, aur Termius setup table shamil hain.
+> Jab bhi koi naya VPS banta hai (`python3 manage_vps_plans.py add-vps ...`), yeh file automatically update ho jaati hai!
+
 > [!NOTE]
 > **Har VPS ke liye Different IP Kaise Kaam Karta Hai?**
 > 1. **Dedicated Mesh IPv4 (Tailscale)**: Har container me `TAILSCALE_AUTHKEY` configure hone par har VPS ko apna alag dedicated static `100.x.y.z` IPv4 mil chuka hai jisse direct `ssh root@100.x.y.z` connect kiya ja sakta hai bina port conflict ke.

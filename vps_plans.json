@@ -1,0 +1,62 @@
+{
+  "1": {
+    "plan": "Plan 1",
+    "container": "root-ubuntu-vps-2",
+    "ram": "4GB",
+    "cpu": "2 vCore",
+    "storage": "80GB NVMe",
+    "ssh_port": 2223,
+    "web_port": 7682,
+    "password": "Plan1@RootVps24",
+    "public_host": "ghostrootvps1.55be7236.sslip.io",
+    "alt_host": "ghostvpsroot1.55be7236.sslip.io"
+  },
+  "2": {
+    "plan": "Plan 2",
+    "container": "root-ubuntu-vps-1",
+    "ram": "8GB",
+    "cpu": "4 vCore",
+    "storage": "200GB NVMe",
+    "ssh_port": 2222,
+    "web_port": 7681,
+    "password": "Plan2@RootVps24",
+    "public_host": "ghostrootvps2.55be7236.sslip.io",
+    "alt_host": "ghostvpsroot2.55be7236.sslip.io"
+  },
+  "3": {
+    "plan": "Plan 3",
+    "container": "root-ubuntu-vps-3",
+    "ram": "16GB",
+    "cpu": "8 vCore",
+    "storage": "300GB NVMe",
+    "ssh_port": 2224,
+    "web_port": 7683,
+    "password": "Plan3@RootVps24",
+    "public_host": "ghostrootvps3.55be7236.sslip.io",
+    "alt_host": "ghostvpsroot3.55be7236.sslip.io"
+  },
+  "4": {
+    "plan": "Plan 4",
+    "container": "root-ubuntu-vps-4",
+    "ram": "24GB",
+    "cpu": "12 vCore",
+    "storage": "400GB NVMe",
+    "ssh_port": 2225,
+    "web_port": 7684,
+    "password": "Plan4@RootVps24",
+    "public_host": "ghostrootvps4.55be7236.sslip.io",
+    "alt_host": "ghostvpsroot4.55be7236.sslip.io"
+  },
+  "5": {
+    "plan": "Plan 5",
+    "container": "root-ubuntu-vps-5",
+    "ram": "32GB",
+    "cpu": "16 vCore",
+    "storage": "500GB NVMe",
+    "ssh_port": 2226,
+    "web_port": 7685,
+    "password": "Plan5@RootVps24",
+    "public_host": "ghostrootvps5.55be7236.sslip.io",
+    "alt_host": "ghostvpsroot5.55be7236.sslip.io"
+  }
+}
