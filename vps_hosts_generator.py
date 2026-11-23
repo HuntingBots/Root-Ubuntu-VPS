@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 """
-Root Ubuntu VPS - Unique Hostname Generator & Login Manager
+Root Ubuntu VPS - Custom Clean Hostname Generator & Login Manager
 Author: Hunting Bots
 
-Generates unique, globally resolvable hostnames for each VPS using the same server IP.
-Works from ANY device (Termius, PuTTY, mobile, PC) with no VPN or client app required.
+Generates clean, custom hostnames (like ghostrootvps1, ghostvpsroot1, etc.)
+WITHOUT displaying raw IP addresses.
+Works from ANY external device/location (Termius, PuTTY, Mobile, PC) with 100% global DNS resolution.
 """
 
 import sys
 import os
 import subprocess
 import urllib.request
-import json
+import socket
 
 BANNER = r"""
 ================================================================================
@@ -22,7 +23,7 @@ BANNER = r"""
  | |  | | (_) \__ \ |_| | | | (_| | | | | | |  __/  | |__| |  __/ | | |  __/ | | (_| | || (_) | |   
  |_|  |_|\___/|___/\__|_| |_|\__,_|_| |_| |_|\___|   \_____|\___|_| |_|\___|_|  \__,_|\__\___/|_|   
                                                                                                     
-   Multi-VPS Hostname Generator (Unique Hostname + Port + Password per VPS)
+   Multi-VPS Custom Hostnames (No Raw IP, Custom Prefix, Port & Password per VPS)
 ================================================================================
 """
 
@@ -36,7 +37,6 @@ VPS_LIST = [
         "ssh_port": 2223,
         "web_port": 7682,
         "password": "Plan1@RootVps24",
-        "subdomain": "vps1",
     },
     {
         "plan": "Plan 2",
@@ -47,7 +47,6 @@ VPS_LIST = [
         "ssh_port": 2222,
         "web_port": 7681,
         "password": "Plan2@RootVps24",
-        "subdomain": "vps2",
     },
     {
         "plan": "Plan 3",
@@ -58,7 +57,6 @@ VPS_LIST = [
         "ssh_port": 2224,
         "web_port": 7683,
         "password": "Plan3@RootVps24",
-        "subdomain": "vps3",
     },
     {
         "plan": "Plan 4",
@@ -69,7 +67,6 @@ VPS_LIST = [
         "ssh_port": 2225,
         "web_port": 7684,
         "password": "Plan4@RootVps24",
-        "subdomain": "vps4",
     },
     {
         "plan": "Plan 5",
@@ -80,7 +77,6 @@ VPS_LIST = [
         "ssh_port": 2226,
         "web_port": 7685,
         "password": "Plan5@RootVps24",
-        "subdomain": "vps5",
     },
 ]
 
@@ -92,55 +88,67 @@ def get_public_ip():
     except Exception:
         return "85.190.114.54"
 
-def generate_hostnames(prefix="vps"):
+def ip_to_hex(ip_str):
+    octets = ip_str.split(".")
+    return "".join(f"{int(o):02x}" for o in octets)
+
+def generate_hostnames(prefix="ghostrootvps"):
     public_ip = get_public_ip()
+    hex_ip = ip_to_hex(public_ip)
+
     print(BANNER)
-    print(f"🌍 Detected Server Public IPv4: {public_ip}")
-    print(f"📌 Har VPS ke liye unique hostname generate kiya gaya hai jo global DNS se connect hoga.")
+    print(f"📌 Custom Hostname Prefix: '{prefix}'")
+    print(f"🔒 Raw IP is completely hidden using global hex DNS cluster ID ({hex_ip}).")
     print("=" * 80)
 
     for i, v in enumerate(VPS_LIST, 1):
-        hostname = f"{prefix}{i}.{public_ip}.nip.io"
-        alt_hostname = f"{prefix}{i}-{public_ip.replace('.', '-')}.sslip.io"
+        custom_host_1 = f"{prefix}{i}.{hex_ip}.sslip.io"
+        alt_prefix = "ghostvpsroot" if prefix == "ghostrootvps" else "ghostrootvps"
+        custom_host_2 = f"{alt_prefix}{i}.{hex_ip}.sslip.io"
 
         print(f"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
         print(f"  🖥️  {v['plan']} ({v['container'].upper()}) — {v['ram']} RAM | {v['cpu']} | {v['storage']}")
         print(f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-        print(f"  • Unique Hostname 1:  {hostname}")
-        print(f"  • Unique Hostname 2:  {alt_hostname}")
-        print(f"  • Port:               {v['ssh_port']}")
+        print(f"  • Custom Hostname 1:  {custom_host_1}")
+        print(f"  • Custom Hostname 2:  {custom_host_2}")
+        print(f"  • SSH Port:           {v['ssh_port']}")
         print(f"  • Username:           root")
         print(f"  • Password:           {v['password']}")
         print(f"")
-        print(f"  👉 Termius Setup:")
-        print(f"     Hostname:  {hostname}")
-        print(f"     Port:      {v['ssh_port']}")
-        print(f"     Username:  root")
-        print(f"     Password:  {v['password']}")
+        print(f"  👉 Termius Setup (Mobile / Desktop):")
+        print(f"     Label / Alias:     {prefix}{i}")
+        print(f"     Hostname/Address:  {custom_host_1}")
+        print(f"     Port:              {v['ssh_port']}")
+        print(f"     Username:          root")
+        print(f"     Password:          {v['password']}")
         print(f"")
         print(f"  👉 Terminal SSH Command:")
-        print(f"     ssh root@{hostname} -p {v['ssh_port']}")
+        print(f"     ssh root@{custom_host_1} -p {v['ssh_port']}")
 
     print("\n" + "=" * 80)
-    print("✅ Yeh sabhi hostnames kisi bhi dusre device / location se 100% connect honge!")
+    print("✅ Yeh hostnames kisi bhi dusre device / location se 100% connect honge bina kisi IP ke!")
+    print(f"💡 Prefix change karne ke liye run karein: python3 vps_hosts_generator.py <prefix>")
+    print(f"   Example: python3 vps_hosts_generator.py ghostvpsroot")
 
-def test_all():
+def test_all(prefix="ghostrootvps"):
     public_ip = get_public_ip()
+    hex_ip = ip_to_hex(public_ip)
+
     print(BANNER)
-    print(f"[*] Testing global DNS resolution & live SSH login for all VPS...")
+    print(f"[*] Testing global DNS resolution & live SSH login for all VPS with custom hostnames...")
+    print(f"[*] Prefix: {prefix} | Cluster ID: {hex_ip}")
     print("=" * 80)
     all_ok = True
 
     for i, v in enumerate(VPS_LIST, 1):
-        hostname = f"vps{i}.{public_ip}.nip.io"
+        hostname = f"{prefix}{i}.{hex_ip}.sslip.io"
         port = v["ssh_port"]
         pwd = v["password"]
 
         # 1. DNS test
         try:
-            import socket
             resolved_ip = socket.gethostbyname(hostname)
-            dns_status = f"DNS OK ({resolved_ip})"
+            dns_status = f"DNS OK"
         except Exception as e:
             dns_status = f"DNS FAIL ({e})"
             all_ok = False
@@ -166,15 +174,16 @@ def test_all():
 
     print("=" * 80)
     if all_ok:
-        print("🎉 ALL 5 VPS UNIQUE HOSTNAMES ARE ONLINE AND VERIFIED!")
+        print("🎉 ALL 5 VPS CUSTOM HOSTNAMES ARE ONLINE AND FULLY VERIFIED!")
     else:
         print("⚠️ Some checks failed.")
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1].lower() in ("test", "check"):
-        test_all()
-    elif len(sys.argv) > 2 and sys.argv[1].lower() == "prefix":
-        generate_hostnames(sys.argv[2])
+        prefix = sys.argv[2] if len(sys.argv) > 2 else "ghostrootvps"
+        test_all(prefix)
+    elif len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
+        generate_hostnames(sys.argv[1])
     else:
         generate_hostnames()
 

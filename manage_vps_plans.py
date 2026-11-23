@@ -33,7 +33,7 @@ VPS_CONFIG = {
         "ssh_port": 2223,
         "web_port": 7682,
         "password": "Plan1@RootVps24",
-        "public_host": "vps1.85-190-114-54.sslip.io",
+        "public_host": "ghostrootvps1.55be7236.sslip.io",
     },
     2: {
         "plan": "Plan 2",
@@ -44,7 +44,7 @@ VPS_CONFIG = {
         "ssh_port": 2222,
         "web_port": 7681,
         "password": "Plan2@RootVps24",
-        "public_host": "vps2.85-190-114-54.sslip.io",
+        "public_host": "ghostrootvps2.55be7236.sslip.io",
     },
     3: {
         "plan": "Plan 3",
@@ -55,7 +55,7 @@ VPS_CONFIG = {
         "ssh_port": 2224,
         "web_port": 7683,
         "password": "Plan3@RootVps24",
-        "public_host": "vps3.85-190-114-54.sslip.io",
+        "public_host": "ghostrootvps3.55be7236.sslip.io",
     },
     4: {
         "plan": "Plan 4",
@@ -66,7 +66,7 @@ VPS_CONFIG = {
         "ssh_port": 2225,
         "web_port": 7684,
         "password": "Plan4@RootVps24",
-        "public_host": "vps4.85-190-114-54.sslip.io",
+        "public_host": "ghostrootvps4.55be7236.sslip.io",
     },
     5: {
         "plan": "Plan 5",
@@ -77,7 +77,7 @@ VPS_CONFIG = {
         "ssh_port": 2226,
         "web_port": 7685,
         "password": "Plan5@RootVps24",
-        "public_host": "vps5.85-190-114-54.sslip.io",
+        "public_host": "ghostrootvps5.55be7236.sslip.io",
     },
 }
 
@@ -115,12 +115,12 @@ def show_all_plans():
         print(f"\n🔹 【 {v['plan']} 】 — {cname.upper()}")
         print(f"   ├─ Hardware:       {v['ram']} RAM | {v['cpu']} | {v['storage']}")
         print(f"   ├─ Root Password:  {v['password']}")
-        print(f"   ├─ Unique Host:    {v['public_host']}  (or {PUBLIC_IP})")
+        print(f"   ├─ Custom Host:    {v['public_host']}")
         print(f"   ├─ SSH Port:       {v['ssh_port']}")
         print(f"   ├─ Web Port:       {v['web_port']}")
         print(f"   ├─ Tailscale IP:   {ts_ip} (SSH Port: 22)")
         print(f"   ├─ Web Terminal:   {cf_url}")
-        print(f"   └─ SSH Command:    ssh root@{PUBLIC_IP} -p {v['ssh_port']}")
+        print(f"   └─ SSH Command:    ssh root@{v['public_host']} -p {v['ssh_port']}")
     print("\n" + "=" * 80)
     print("💡 Yeh details kisi bhi phone/laptop/Termius/PuTTY me direct kaam karengi!")
 

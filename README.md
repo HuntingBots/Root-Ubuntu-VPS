@@ -160,18 +160,19 @@ python3 Vps-cli.py status
 
 ## 📊 VPS Plans & Specifications
 
-| Plan | Container Name | RAM | vCPU | Storage (NVMe) | Unique Global Hostname | SSH Port | Password | Direct SSH Command |
+| Plan | Container Name | RAM | vCPU | Storage (NVMe) | Custom Clean Hostname | SSH Port | Password | Direct SSH Command |
 | :--- | :--- | :---: | :---: | :---: | :--- | :---: | :---: | :--- |
-| **Plan 1** | `root-ubuntu-vps-2` | **4 GB** | **2 vCore** | **80 GB** | `vps1.85.190.114.54.nip.io` | **`2223`** | `Plan1@RootVps24` | `ssh root@vps1.85.190.114.54.nip.io -p 2223` |
-| **Plan 2** | `root-ubuntu-vps-1` | **8 GB** | **4 vCore** | **200 GB** | `vps2.85.190.114.54.nip.io` | **`2222`** | `Plan2@RootVps24` | `ssh root@vps2.85.190.114.54.nip.io -p 2222` |
-| **Plan 3** | `root-ubuntu-vps-3` | **16 GB** | **8 vCore** | **300 GB** | `vps3.85.190.114.54.nip.io` | **`2224`** | `Plan3@RootVps24` | `ssh root@vps3.85.190.114.54.nip.io -p 2224` |
-| **Plan 4** | `root-ubuntu-vps-4` | **24 GB** | **12 vCore** | **400 GB** | `vps4.85.190.114.54.nip.io` | **`2225`** | `Plan4@RootVps24` | `ssh root@vps4.85.190.114.54.nip.io -p 2225` |
-| **Plan 5** | `root-ubuntu-vps-5` | **32 GB** | **16 vCore** | **500 GB** | `vps5.85.190.114.54.nip.io` | **`2226`** | `Plan5@RootVps24` | `ssh root@vps5.85.190.114.54.nip.io -p 2226` |
+| **Plan 1** | `root-ubuntu-vps-2` | **4 GB** | **2 vCore** | **80 GB** | `ghostrootvps1.55be7236.sslip.io` | **`2223`** | `Plan1@RootVps24` | `ssh root@ghostrootvps1.55be7236.sslip.io -p 2223` |
+| **Plan 2** | `root-ubuntu-vps-1` | **8 GB** | **4 vCore** | **200 GB** | `ghostrootvps2.55be7236.sslip.io` | **`2222`** | `Plan2@RootVps24` | `ssh root@ghostrootvps2.55be7236.sslip.io -p 2222` |
+| **Plan 3** | `root-ubuntu-vps-3` | **16 GB** | **8 vCore** | **300 GB** | `ghostrootvps3.55be7236.sslip.io` | **`2224`** | `Plan3@RootVps24` | `ssh root@ghostrootvps3.55be7236.sslip.io -p 2224` |
+| **Plan 4** | `root-ubuntu-vps-4` | **24 GB** | **12 vCore** | **400 GB** | `ghostrootvps4.55be7236.sslip.io` | **`2225`** | `Plan4@RootVps24` | `ssh root@ghostrootvps4.55be7236.sslip.io -p 2225` |
+| **Plan 5** | `root-ubuntu-vps-5` | **32 GB** | **16 vCore** | **500 GB** | `ghostrootvps5.55be7236.sslip.io` | **`2226`** | `Plan5@RootVps24` | `ssh root@ghostrootvps5.55be7236.sslip.io -p 2226` |
 
 > [!TIP]
-> **Unique Hostnames Script (`vps_hosts_generator.py`)**:
-> Run `python3 vps_hosts_generator.py` to see all Termius/PuTTY ready-to-use profiles.
-> Run `python3 vps_hosts_generator.py test` to verify live DNS resolution & SSH login across all 5 VPS!
+> **Custom Hostnames Manager (`vps_hosts_generator.py`)**:
+> - Run `python3 vps_hosts_generator.py` to see Termius / PuTTY connection details (bina kisi raw IP ke).
+> - Run `python3 vps_hosts_generator.py test` to verify live DNS resolution & SSH login across all 5 VPS.
+> - Run `python3 vps_hosts_generator.py <custom_prefix>` (e.g. `python3 vps_hosts_generator.py ghostvpsroot`) apni pasand ka prefix set karne ke liye!
 
 > [!NOTE]
 > **Har VPS ke liye Different IP Kaise Kaam Karta Hai?**
