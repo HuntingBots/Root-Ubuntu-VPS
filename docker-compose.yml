@@ -17,8 +17,10 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7681
       - QUICK_TUNNEL=true
-    mem_limit: 4g
-    cpus: 2.0
+      - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
+      - TAILSCALE_HOSTNAME=root-ubuntu-vps-1
+    mem_limit: 8g
+    cpus: 4.0
     cap_add:
       - NET_ADMIN
     devices:
@@ -39,8 +41,10 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7682
       - QUICK_TUNNEL=true
-    mem_limit: 8g
-    cpus: 4.0
+      - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
+      - TAILSCALE_HOSTNAME=root-ubuntu-vps-2
+    mem_limit: 4g
+    cpus: 2.0
     cap_add:
       - NET_ADMIN
     devices:
@@ -61,6 +65,8 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7683
       - QUICK_TUNNEL=true
+      - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
+      - TAILSCALE_HOSTNAME=root-ubuntu-vps-3
     mem_limit: 16g
     cpus: 8.0
     cap_add:
@@ -83,6 +89,8 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7684
       - QUICK_TUNNEL=true
+      - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
+      - TAILSCALE_HOSTNAME=root-ubuntu-vps-4
     mem_limit: 24g
     cpus: 12.0
     cap_add:
@@ -105,6 +113,8 @@ services:
       - ROOT_PASSWORD=HuntingBots123!
       - PORT=7685
       - QUICK_TUNNEL=true
+      - TAILSCALE_AUTHKEY=${TAILSCALE_AUTHKEY:-}
+      - TAILSCALE_HOSTNAME=root-ubuntu-vps-5
     mem_limit: 32g
     cpus: 16.0
     cap_add:

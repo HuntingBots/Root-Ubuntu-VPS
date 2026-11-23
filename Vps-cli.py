@@ -26,8 +26,8 @@ BANNER = r"""
 """
 
 VPS_PLANS = {
-    1: {"name": "Plan 1", "ram": "4GB", "storage": "80GB NVMe", "cpu": "2 vCore", "web_port": 7681, "ssh_port": 2222, "service": "root-ubuntu-vps-1"},
-    2: {"name": "Plan 2", "ram": "8GB", "storage": "200GB NVMe", "cpu": "4 vCore", "web_port": 7682, "ssh_port": 2223, "service": "root-ubuntu-vps-2"},
+    1: {"name": "Plan 1", "ram": "4GB", "storage": "80GB NVMe", "cpu": "2 vCore", "web_port": 7682, "ssh_port": 2223, "service": "root-ubuntu-vps-2"},
+    2: {"name": "Plan 2", "ram": "8GB", "storage": "200GB NVMe", "cpu": "4 vCore", "web_port": 7681, "ssh_port": 2222, "service": "root-ubuntu-vps-1"},
     3: {"name": "Plan 3", "ram": "16GB", "storage": "300GB NVMe", "cpu": "8 vCore", "web_port": 7683, "ssh_port": 2224, "service": "root-ubuntu-vps-3"},
     4: {"name": "Plan 4", "ram": "24GB", "storage": "400GB NVMe", "cpu": "12 vCore", "web_port": 7684, "ssh_port": 2225, "service": "root-ubuntu-vps-4"},
     5: {"name": "Plan 5", "ram": "32GB", "storage": "500GB NVMe", "cpu": "16 vCore", "web_port": 7685, "ssh_port": 2226, "service": "root-ubuntu-vps-5"},
@@ -61,29 +61,40 @@ def check_backend_health(url):
 
 def show_plans():
     print(BANNER)
-    print("=" * 65)
-    print("                      VPS TIERS & PLANS")
-    print("=" * 65)
+    print("=" * 70)
+    print("                         VPS TIERS & PLANS")
+    print("=" * 70)
     for num, plan in VPS_PLANS.items():
-        print(f"\n[{plan['name']}] -> Container: {plan['service']}")
-        print(f"  • RAM:      {plan['ram']}")
-        print(f"  • Storage:  {plan['storage']}")
-        print(f"  • CPU:      {plan['cpu']}")
-        print(f"  • Web Port: {plan['web_port']} (Web Terminal)")
-        print(f"  • SSH Port: {plan['ssh_port']} (OpenSSH)")
-    print("\n" + "=" * 65)
+        cname = plan["service"]
+        ts_ip = "N/A"
+        try:
+            ts_ip = subprocess.check_output(
+                ["docker", "exec", cname, "tailscale", "ip", "-4"],
+                text=True, stderr=subprocess.DEVNULL
+            ).strip()
+        except Exception:
+            pass
+
+        print(f"\n[{plan['name']}] -> Container: {cname}")
+        print(f"  • RAM:          {plan['ram']}")
+        print(f"  • Storage:      {plan['storage']}")
+        print(f"  • CPU:          {plan['cpu']}")
+        print(f"  • Tailscale IP: {ts_ip if ts_ip else 'Not Connected'}")
+        print(f"  • Web Port:     {plan['web_port']} (Web Terminal)")
+        print(f"  • SSH Port:     {plan['ssh_port']} (OpenSSH)")
+    print("\n" + "=" * 70)
 
 def check_all_vps():
     print(BANNER)
     print("[*] Checking health for all 5 VPS local instances...")
     for num, plan in VPS_PLANS.items():
         url = f"http://localhost:{plan['web_port']}"
-        print(f"\n--- {plan['name']} (Port {plan['web_port']}) ---")
+        print(f"\n--- {plan['name']} ({plan['service']} - Port {plan['web_port']}) ---")
         check_backend_health(url)
 
 def show_vps_status():
     print(BANNER)
-    print("[*] Inspecting running Docker containers and Cloudflare Tunnels...")
+    print("[*] Inspecting running Docker containers, Tailscale IPs & Cloudflare Tunnels...")
     try:
         out = subprocess.check_output(
             ["docker", "ps", "--filter", "name=root-ubuntu-vps", "--format", "{{.Names}}\t{{.Status}}\t{{.Ports}}"],
@@ -94,17 +105,29 @@ def show_vps_status():
     except Exception as e:
         print(f"[✗] Could not query docker: {e}")
 
-    print("\nCloudflare Quick Tunnels:")
-    for num, plan in VPS_PLANS.items():
+    print("\nTailscale Dedicated IPs & Cloudflare Quick Tunnels:")
+    for num, plan in sorted(VPS_PLANS.items()):
         cname = plan["service"]
+        ts_ip = "N/A"
+        cf = "Not active"
+        try:
+            ts_ip = subprocess.check_output(
+                ["docker", "exec", cname, "tailscale", "ip", "-4"],
+                text=True, stderr=subprocess.DEVNULL
+            ).strip()
+        except Exception:
+            pass
         try:
             cf = subprocess.check_output(
                 ["docker", "exec", cname, "sh", "-c", "grep -o 'https://[-a-zA-Z0-9@:%._\\+~#=]*\\.trycloudflare\\.com' /tmp/cloudflared.log 2>/dev/null | head -n 1"],
                 text=True
             ).strip()
-            print(f"  - {plan['name']} ({cname}): {cf if cf else 'Not active'}")
         except Exception:
-            print(f"  - {plan['name']} ({cname}): Offline / Unavailable")
+            pass
+
+        print(f"  [{plan['name']}] ({cname}):")
+        print(f"      • Tailscale Dedicated IPv4: {ts_ip if ts_ip else 'N/A'}")
+        print(f"      • Cloudflare Tunnel:        {cf if cf else 'Offline'}")
 
 def run_local_docker():
     print("\n[*] Starting local Docker container for Root Ubuntu VPS...")
@@ -130,8 +153,8 @@ def run_local_docker():
 def print_help():
     print(BANNER)
     print("Available Commands:")
-    print("  1. plans                 Show all 5 VPS Plans with specs and ports")
-    print("  2. status                Show status & Cloudflare URLs for all 5 VPS")
+    print("  1. plans                 Show all 5 VPS Plans with specs and Tailscale IPs")
+    print("  2. status                Show status, Tailscale IPs & Cloudflare URLs for all 5 VPS")
     print("  3. check-all             Health-check all 5 VPS web terminals")
     print("  4. check <URL>           Check if a specific VPS URL is online")
     print("  5. gen-pass              Generate a strong random root password")
